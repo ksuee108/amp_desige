@@ -14,6 +14,20 @@ main_tab1, main_tab2, main_tab3 = st.tabs(["Home", "About this App", "How to Des
 # --- 固定底部 Footer ---
 footer = """
 <style>
+
+/* 移除 Streamlit 預設的主內容 padding */
+main > div {
+    padding-bottom: 0px !important;
+    padding-top: 0px !important;
+}
+
+/* 確保 Body 不被 footer 擋到 */
+body {
+    margin: 0;
+    padding-bottom: 60px; /* footer 高度 */
+}
+
+/* 固定底部 Footer */
 .footer-text {
     position: fixed;
     left: 0;
@@ -27,26 +41,25 @@ footer = """
     border-top: 1px solid #ccc;
     z-index: 1000;
 }
+
 </style>
 
 <div class="footer-text">
-
-    🚀 AMP Design App © 2025 
-    Citation: Yang C-H, Chen Y-L, Cheung T-H, Chuang L-Y. Multi-Objective Optimization Accelerates the De Novo Design of Antimicrobial Peptide for Staphylococcus aureus. International Journal of Molecular Sciences. 2024; 25(24):13688. https://doi.org/10.3390/ijms252413688
+    🚀 AMP Design App © 2025<br>
 </div>
 """
+st.markdown(footer, unsafe_allow_html=True)
+
+
 with main_tab1:
     # ----------------------------
     # Sidebar inputs
     # ----------------------------
+    st.sidebar.header("Select Bacteria")
     Bacteria = st.sidebar.multiselect(
-        "Select Bacteria",
+        "Choose bacteria",
         options=["E. coli", "S. aureus", "P. aeruginosa", "A. baumannii"]
     )
-    pop_size = st.sidebar.number_input("Population size", min_value=10, max_value=400, value=80, step=10)
-    length = st.sidebar.number_input("Peptide sequence length", min_value=10, max_value=20, value=10, step=1)
-    generations = st.sidebar.number_input("Number of generations", min_value=10, max_value=200, value=100, step=1)
-
     st.sidebar.header("Select Algorithms")
     algorithms = st.sidebar.multiselect(
         "Choose optimization algorithms",
@@ -55,6 +68,11 @@ with main_tab1:
             'U-NSGA-III', 'AGE-MOEA', 'AGE-MOEA-II'
         ]
     )
+    pop_size = st.sidebar.number_input("Population size", min_value=10, max_value=400, value=80, step=10)
+    length = st.sidebar.number_input("Peptide sequence length", min_value=10, max_value=20, value=10, step=1)
+    generations = st.sidebar.number_input("Number of generations", min_value=10, max_value=200, value=100, step=1)
+
+    
     # ----------------------------
     # Objective selection
     # ----------------------------
@@ -256,6 +274,15 @@ with main_tab1:
         st.info("No optimization results cached yet. Run optimization first.")
 
     for algo in algorithms:
+        # --- 安全檢查，確保變數存在 ---
+        if "merged_df_flipped" not in locals() or merged_df_flipped is None:
+            #st.warning(f"Skip {algo} because merged_df_flipped is not defined.")
+            continue
+
+        if "pareto_df_flipped" not in locals() or pareto_df_flipped is None:
+            #st.warning(f"Skip {algo} because pareto_df_flipped is not defined.")
+            continue
+        # --------------------------------
         fasta_path = os.path.join(user_home, f"{algo}.fasta")
         with open(fasta_path, "w") as fasta_file:
             for _, row in merged_df_flipped.iterrows():
@@ -295,7 +322,7 @@ with main_tab2:
     - Pharmaceutical developers focusing on antimicrobial agents.
     - Educators and students in related fields.
     ### Citation:
-    If you use this app for your research, please cite the following paper:
+    If you use this app for your research, please cite the following paper:\n
     Yang C-H, Chen Y-L, Cheung T-H, Chuang L-Y. Multi-Objective Optimization Accelerates the De Novo Design of Antimicrobial Peptide for Staphylococcus aureus. International Journal of Molecular Sciences. 2024; 25(24):13688. https://doi.org/10.3390/ijms252413688
     """)
 
@@ -305,11 +332,24 @@ with main_tab3:
     1. **Select Bacteria**: Use the sidebar to choose the bacteria you want to target. *You must select at least one.*
     2. **Set Parameters**: Define population size, peptide length, and number of generations.
     3. **Choose Algorithms**: Select one or more optimization algorithms from the sidebar.
+    """)
+    st.image("螢幕擷取畫面 2025-11-16 012845.png")
+    st.markdown("""
     4. **Select Objectives**: Pick at least two physicochemical properties to optimize.
+                """)
+    st.image("螢幕擷取畫面 2025-11-16 013006.png")
+    st.markdown("""
     5. **Define Constraints**: Optionally, set constraints on specific properties.
+                """)
+    st.image("螢幕擷取畫面 2025-11-16 013025.png")
+    st.markdown("""
     6. **Run Optimization**: Click the "Run Optimization" button to start the process.
     7. **View Results**: After completion, view and download the optimized peptide sequences and their properties.
     8. **Plot Results**: Generate visualizations of the optimization results and amino acid distributions.
+                """)
+    st.image("螢幕擷取畫面 2025-11-16 013229.png")
+    st.markdown("""
+    If you encounter any issues or have questions, please upload your issues or figure to the 
+                https://github.com/ksuee108/amp_desige/issues, and we will get back to you as soon as possible.
     """)
-    
-st.markdown(footer, unsafe_allow_html=True)
+#st.markdown(footer, unsafe_allow_html=True)

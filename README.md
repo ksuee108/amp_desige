@@ -1,4 +1,4 @@
-# amp_desige
+# amp_design
 
 ### How to run it on your own machine
 
